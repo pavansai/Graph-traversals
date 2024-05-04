@@ -1,1 +1,211 @@
+102. Binary Tree Level Order Traversal
+
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    public List<List<Integer>> levelOrder(TreeNode root) {
+        Queue<TreeNode> q = new LinkedList<>();
+        List<List<Integer>> res = new ArrayList<>();
+        if(root == null) return res;
+        q.add(root);
+        while(!q.isEmpty()){
+            int size = q.size();
+            List<Integer> list = new ArrayList<>();
+            for(int i=0; i<size; i++){
+                TreeNode node = q.poll();
+                list.add(node.val);
+            if(node.left!=null){
+                q.add(node.left);
+            }
+            if(node.right!=null)
+                q.add(node.right);
+            }
+            res.add(list);
+        }
+        Collections.reverse(res);
+        return res;
+    }
+}
+
+
+103. Binary Tree Zigzag Level Order Traversal
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    public List<List<Integer>> zigzagLevelOrder(TreeNode root) {
+        Queue<TreeNode> q = new LinkedList<>();
+        List<List<Integer>> res = new ArrayList<>();
+        boolean flag = false;
+        if(root == null) return res;
+        q.add(root);
+        while(!q.isEmpty()){
+            int size = q.size();
+            List<Integer> list = new ArrayList<>();
+            for(int i=0; i<size; i++){
+                TreeNode node = q.poll();
+                list.add(node.val);
+            if(node.left!=null){
+                q.add(node.left);
+            }
+            if(node.right!=null)
+                q.add(node.right);
+            }
+            if(flag)
+                Collections.reverse(list);
+            res.add(list);
+            System.out.println(flag);
+            flag = !flag;
+        }
+        return res;
+    }
+}
+
+107. Binary Tree Level Order Traversal II
+
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    public List<List<Integer>> levelOrderBottom(TreeNode root) {
+        List<List<Integer>> result = new ArrayList<>();
+        
+        if (root == null) {
+            return result;
+        }
+        
+        Deque<TreeNode> queue = new LinkedList<>();
+        queue.offer(root);
+        
+        while (!queue.isEmpty()) {
+            int size = queue.size();
+            List<Integer> currentLevel = new ArrayList<>();
+            
+            for (int i = 0; i < size; i++) {
+                TreeNode node = queue.poll();
+                currentLevel.add(node.val);
+                
+                if (node.left != null) {
+                    queue.offer(node.left);
+                }
+                if (node.right != null) {
+                    queue.offer(node.right);
+                }
+            }
+            
+            result.addFirst(currentLevel);
+        }
+        
+        return result;
+    }
+}
+
+111. Minimum Depth of Binary Tree
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    public int minDepth(TreeNode root){
+        if(root == null) return 0;
+        Queue<TreeNode> q = new LinkedList<>();
+        q.add(root);
+        int depth=1;
+        while(!q.isEmpty()){
+            int size=q.size();
+            for(int i=0; i<size; i++){
+                TreeNode node = q.remove();
+                if(node==null){
+                    continue;
+                }
+                if(node.left == null && node.right==null){
+                    return depth;
+                }
+                q.add(node.left);
+                q.add(node.right);
+            }
+            depth++;
+        }
+        return -1;
+    }
+}
+
+116. Populating Next Right Pointers in Each Node 
+^^^^^^^^^^^^^ try to solve with constant extra space next time ^^^^^^^^^^^^^
+
+class Solution{
+    public Node connect(Node root){
+        if (root == null)
+            return root;
+
+        Queue<Node> queue = new LinkedList<>();
+        queue.offer(root);
+
+        while (!queue.isEmpty()) {
+            int size = queue.size();
+
+            for (int i = 0; i < size; i++) {
+                Node node = queue.poll();
+
+                if (i < size - 1)
+                    node.next = queue.peek();
+
+                if (node.left != null)
+                    queue.offer(node.left);
+                if (node.right != null)
+                    queue.offer(node.right);
+            }
+        }
+
+        return root;
+    }
+}
 
