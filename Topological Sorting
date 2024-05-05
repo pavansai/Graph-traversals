@@ -1,0 +1,118 @@
+207. Course Schedule
+class Solution {
+    public boolean canFinish(int numCourses, int[][] prerequisites) {
+        Queue<Integer> q = new LinkedList<>();
+        List<List<Integer>> adj = new ArrayList<>();
+        int [] inDegree = new int[numCourses];
+        for(int i=0; i<numCourses; i++){
+            adj.add(new ArrayList<>());
+        }
+        for(int [] p : prerequisites){
+            adj.get(p[1]).add(p[0]);
+            inDegree[p[0]]++;
+        }
+        for(int i=0; i<numCourses; i++){
+            if(inDegree[i] == 0){
+                q.offer(i);
+            }
+        }
+        int [] top = new int [numCourses];
+        int i=0;
+        while(!q.isEmpty()){
+            int  node = q.peek();
+            q.remove();
+            top[i++] = node;
+            for(int it: adj.get(node)){
+                inDegree[it]--;
+                if(inDegree[it] == 0){
+                    q.add(it);
+                }
+            }
+        }
+        return i== numCourses;
+    }
+}
+
+210. Course Schedule II
+
+class Solution {
+    public int[] findOrder(int numCourses, int[][] prerequisites) {
+        List<List<Integer>> res = new ArrayList<>();
+        for(int i=0; i<numCourses; i++){
+            res.add(new ArrayList<>());
+        }
+        for(int [] p : prerequisites){
+            res.get(p[1]).add(p[0]);
+        }
+        Queue<Integer> q = new LinkedList<>();
+        int  [] inDegree = new int[numCourses];
+        for(List<Integer> list : res){
+            for(int i : list){
+                inDegree[i]++;
+            }
+        }
+        for(int i=0; i<numCourses; i++){
+            if(inDegree[i] == 0){
+                q.add(i);
+            }
+        }
+        int [] output = new int[numCourses];
+        int k=0;
+        while(!q.isEmpty()){
+            int v = q.poll();
+            output[k++] = v;
+            for(int m : res.get(v)){
+                inDegree[m]--;
+                if(inDegree[m] == 0){
+                    q.add(m);
+                }
+            }
+        }
+        return k < numCourses ? new int [] {} : output;
+    }
+}
+
+310. Minimum Height Trees
+
+class Solution {
+    public List<Integer> findMinHeightTrees(int n, int[][] edges) {
+        List<Integer> list = new ArrayList<>();
+        List<List<Integer>> adj = new ArrayList<>();
+        if(n == 1){
+            list.add(0);
+            return list;
+        }
+        for(int i=0; i<n; i++){
+            adj.add(new ArrayList<>());
+        }
+        int [] inDegree = new int [n];
+
+        for(int [] e : edges){
+            adj.get(e[0]).add(e[1]);
+            adj.get(e[1]).add(e[0]);
+            inDegree[e[0]]++;
+            inDegree[e[1]]++;
+        }
+        Queue<Integer> q = new LinkedList<>();
+        for(int i=0; i<n; i++){
+            if(inDegree[i] == 1){
+                q.add(i);
+            }
+        }
+        while(n>2){
+            int size=q.size();
+            n-=size;
+            while(size--> 0){
+                int v = q.poll();
+                for(int k : adj.get(v)){
+                    inDegree[k]--;
+                    if(inDegree[k] == 1){
+                        q.add(k);
+                    }
+                }
+            }
+        }
+        list.addAll(q);
+        return list;
+    }
+}
