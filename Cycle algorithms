@@ -1,0 +1,89 @@
+2360. Longest Cycle in a Graph
+
+class Solution {
+    public int longestCycle(int[] edges) {
+        int l=edges.length;
+        int [] inDegree = new int [l];
+
+        for(int e: edges){
+            if(e != -1){
+                inDegree[e]++;
+            }
+        }
+
+        Queue<Integer> q = new LinkedList<>();
+        for(int i=0; i<l; i++){
+            if(inDegree[i] == 0){
+                q.add(i);
+            }
+        }
+
+        int [] vis = new int [l];
+        while(!q.isEmpty()){
+            int v = q.poll();
+            vis[v] = 1;
+            int n = edges[v];
+            if(n != -1){
+                inDegree[n]--;
+                if(inDegree[n] == 0){
+                    q.add(n);
+                }
+            }
+        }
+
+        int ans=-1;
+        for(int i=0; i<l; i++){
+            if(vis[i] == 0){
+                int count = 1;
+                vis[i]=1;
+                int neighbor = edges[i];
+                while(neighbor != i){
+                    vis[neighbor] = 1;
+                    neighbor = edges[neighbor];
+                    count++;
+                }
+                ans=Math.max(ans, count);
+            }
+        }
+        return ans;
+    }
+}
+
+2608. Shortest Cycle in a Graph
+class Solution {
+    public int findShortestCycle(int n, int[][] edges) {
+        
+        List<List<Integer>> adj = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            adj.add(new ArrayList<>());
+        }
+        for (int[] edge : edges) {
+            int u = edge[0], v = edge[1];
+            adj.get(u).add(v);
+            adj.get(v).add(u);
+        }
+        
+       
+        int minCycle = Integer.MAX_VALUE;
+        for (int i = 0; i < n; i++) {
+            int[] dist = new int[n];
+            Arrays.fill(dist, -1);
+            Queue<Integer> queue = new LinkedList<>();
+            queue.add(i);
+            dist[i] = 0;
+            while (!queue.isEmpty()) {
+                int u = queue.remove();
+                for (int v : adj.get(u)) {
+                    if (dist[v] == -1) {
+                        dist[v] = dist[u] + 1;
+                        queue.add(v);
+                    } else if (v != i && dist[v] >= dist[u]) {
+                        minCycle = Math.min(minCycle, dist[u] + dist[v] + 1);
+                    }
+                }
+            }
+        }
+        
+        return (minCycle == Integer.MAX_VALUE) ? -1 : minCycle;
+    }
+}
