@@ -1,0 +1,127 @@
+743. Network Delay Time
+
+class Solution {
+    public int networkDelayTime(int[][] times, int n, int k) {
+        List<List<int[]>> adj = new ArrayList<>();
+        for(int i=0; i<=n; i++){
+            adj.add(new ArrayList<>());
+        }
+        for(int [] t : times){
+            int u = t[0];
+            int v = t[1];
+            int w = t[2];
+            adj.get(u).add(new int[]{v, w});
+        }
+        int [] dist = new int[n+1];
+        Arrays.fill(dist, Integer.MAX_VALUE);
+        dist[k]  = 0;
+        PriorityQueue<int[]> pq = new PriorityQueue<>((a, b) -> a[1]-b[1]);
+        pq.add(new int[]{k, 0});
+        while(!pq.isEmpty()){
+            int [] curr = pq.poll();
+            int currNode = curr[0];
+            int currDist = curr[1];
+
+            for(int [] edge: adj.get(currNode)){
+                int adjNode = edge[0];
+                int adjDist = edge[1] + currDist;
+
+                if(adjDist < dist[adjNode]){
+                    dist[adjNode] = adjDist;
+                    pq.offer(new int []{adjNode, adjDist});
+                }
+            }
+        }
+        int maxDist = 0;
+        for(int i=1; i<=n; i++){
+            if(dist[i] == Integer.MAX_VALUE){
+                return -1;
+            }
+            maxDist = Math.max(maxDist, dist[i]);
+        }
+        return maxDist;
+    }
+}
+
+787. Cheapest Flights Within K Stops
+
+class Solution {
+    public int findCheapestPrice(int n, int[][] flights, int src, int dst, int k) {
+        List<List<int[]>> adj = new ArrayList<>();
+        for(int i=0; i<n; i++){
+            adj.add(new ArrayList<>());
+        }
+        for(int f []: flights){
+            int u=f[0];
+            int v=f[1];
+            int w=f[2];
+            adj.get(u).add(new int[]{v, w});
+        }
+        int [] distn = new int [n];
+        Arrays.fill(distn, Integer.MAX_VALUE);
+        Queue<int[]> q = new LinkedList<>();
+        q.offer(new int[]{src, 0});
+        int stops = 0;
+        while( stops<=k && !q.isEmpty()){
+            int size = q.size();
+                while(size-->0){
+                    int [] curr = q.poll();
+                    int node = curr[0];
+                    int dist = curr[1];
+                    for(int [] edge : adj.get(node)){
+                    int neighbor = edge[0];
+                    int p = edge[1];
+                    if(p + dist >= distn[neighbor])
+                        continue;
+                    distn[neighbor] = p+dist;
+                    q.offer(new int[]{neighbor, distn[neighbor]});
+                    }
+                }
+                stops++;
+        }
+        return distn[dst] == Integer.MAX_VALUE ? -1: distn[dst];
+    }
+}
+
+
+882. Reachable Nodes In Subdivided Graph
+
+class Solution {
+    public int reachableNodes(int[][] edges, int maxMoves, int n) {
+       int[][] graph = new int[n][n];
+        for ( int[] t: graph ) {
+            Arrays.fill(t, -1);
+        }
+        for ( int[] t: edges ) {
+            graph[t[0]][t[1]] = t[2];
+            graph[t[1]][t[0]] = t[2];
+        }
+        PriorityQueue<int[]> heap = new PriorityQueue<>( (a, b) -> b[1]-a[1] );
+        int ans = 0;
+        boolean[] vis = new boolean[n];
+        heap.offer(new int[]{0, maxMoves});
+        while ( !heap.isEmpty() ) {
+            int[] info = heap.poll();
+            int adjNode = info[0];
+            int remMoves = info[1];
+            if ( vis[adjNode] ) {
+                continue;
+            }
+		    vis[adjNode] = true;
+			
+            ans++;
+            for ( int i=0; i<n; i++ ) {
+                if ( graph[adjNode][i]!=-1 ) {
+                    if ( !vis[i] && remMoves >=graph[adjNode][i]+1 ) {
+                        heap.offer( new int[] {i, remMoves-graph[adjNode][i]-1} );
+                    }
+                    int movesTaken = Math.min(remMoves, graph[adjNode][i]);
+                    graph[adjNode][i] -= movesTaken;
+                    graph[i][adjNode] -= movesTaken;
+                    ans += movesTaken;
+                }
+            }
+        }
+        return ans;
+    }
+}
