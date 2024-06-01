@@ -32,7 +32,7 @@ class Solution {
         return i== numCourses;
     }
 }
-
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 210. Course Schedule II
 
 class Solution {
@@ -71,7 +71,7 @@ class Solution {
         return k < numCourses ? new int [] {} : output;
     }
 }
-
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 310. Minimum Height Trees
 
 class Solution {
@@ -116,3 +116,329 @@ class Solution {
         return list;
     }
 }
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+2050. Parallel Courses III
+
+class Solution {
+    public int minimumTime(int n, int[][] relations, int[] time){
+        List<List<Integer>> adj = new ArrayList<>();
+        for(int i=0; i<=n; i++){
+            adj.add(new ArrayList<>());
+        }
+        int [] in = new int[n+1];
+        for(int [] r: relations){
+            adj.get(r[0]).add(r[1]);
+            in[r[1]]++;
+        }
+        Queue<Integer> q = new LinkedList<>();
+        int [] t = new int [n+1];
+        for(int i=1; i<=n; i++){
+            if(in[i] == 0){
+                q.offer(i);
+                t[i] = time[i-1];
+            }
+        }
+        int mintime = 0;
+        while(!q.isEmpty()){
+            int size = q.size();
+            while(size-->0){
+                int course = q.remove();
+                for(int newCourse : adj.get(course)){
+                    in[newCourse]--;
+                    t[newCourse] = Math.max(t[newCourse], t[course] + time[newCourse-1]);
+                    if(in[newCourse] == 0){
+                        q.offer(newCourse);
+                    }
+                }
+            }
+        }
+        for(int i=1; i<=n; i++){
+            mintime = Math.max(mintime, t[i]);
+        }
+        return mintime;
+    }
+}
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+2115. Find All Possible Recipes from Given
+
+class Solution {
+    public List<String> findAllRecipes(String[] recipes, List<List<String>> ingredients, String[] supplies){
+
+        HashMap<String, List<String>> map = new HashMap<>();
+        HashMap<String, Integer> indegree = new HashMap<>();
+
+        List<String> res = new ArrayList<>();
+        for(int i=0; i<recipes.length; i++){
+            String r = recipes[i];
+            indegree.put(r, ingredients.get(i).size());
+            for(String ingredient: ingredients.get(i)){
+                map.putIfAbsent(ingredient, new ArrayList<>());
+                map.get(ingredient).add(r);
+            }
+        }
+
+        Queue<String> q = new LinkedList<>();
+        for(String s: supplies){
+            q.offer(s);
+        }
+
+        while(!q.isEmpty()){
+            String item = q.poll();
+            if(Arrays.asList(recipes).contains(item)){
+                res.add(item);
+            }
+            for(String recipe : map.getOrDefault(item, new ArrayList<>())){
+                indegree.put(recipe, indegree.get(recipe) - 1);
+                if(indegree.get(recipe) == 0) q.offer(recipe);
+            }
+        }
+
+        return res;
+        
+    }
+}
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+1857. Largest Color Value in a Directed Graph
+
+class Solution {
+    public int largestPathValue(String colors, int[][] edges) {
+        int n = colors.length();
+        List<List<Integer>> adj = new ArrayList<>();
+        for(int i=0; i<n; i++){
+            adj.add(new ArrayList<>());
+        }
+        int [] cnt = new int [n];
+        for(int [] edge : edges){
+            adj.get(edge[0]).add(edge[1]);
+            cnt[edge[1]]++;
+        }
+        int [][] color_count = new int [n][26];
+        Queue<Integer> q = new LinkedList<>();
+        for(int i=0; i<n; i++){
+            if(cnt[i] == 0) q.offer(i);
+        }
+        int seen = 0;
+        int ans=0;
+        while(!q.isEmpty()){
+            int node = q.remove();
+            seen++;
+            color_count[node][colors.charAt(node) - 'a']++;
+            ans = Math.max(ans, color_count[node][colors.charAt(node) - 'a']);
+            for(int adjNode : adj.get(node)){
+                for(int i=0; i<26; i++){
+                    color_count[adjNode][i] = Math.max(color_count[adjNode][i], color_count[node][i]);
+                }
+                cnt[adjNode]--;
+                if(cnt[adjNode] == 0) q.offer(adjNode);
+            }
+        }
+        return seen < n ? -1 : ans;
+    }
+}
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+329. Longest Increasing Path in a Matrix
+
+class Solution {
+    public int longestIncreasingPath(int[][] matrix){
+        int row = matrix.length;
+        int col = matrix[0].length;
+
+        int [][] DIR = {{0,1}, {0,-1}, {1, 0}, {-1, 0}};
+        int [][] in = new int[row][col];
+        for(int i=0; i<row; i++){
+            for(int j=0; j<col; j++){
+                for(int [] D : DIR){
+                    int x = D[0] + i;
+                    int y = D[1] + j;
+                    if(x >=0 && x<row && y>=0 && y<col){
+                        if(matrix[x][y] > matrix[i][j]){
+                            in[x][y]++;
+                        }
+                    }
+                }
+            }
+        }
+        Queue<int[]> q = new LinkedList<>();
+        for(int i=0; i<row; i++){
+            for(int j=0; j<col; j++){
+                if(in[i][j] == 0){
+                    q.offer(new int []{i, j});
+                }
+            }
+        }
+        int len = 0;
+        while(!q.isEmpty()){
+            int size=q.size();
+            while(size-->0){
+            int [] node = q.remove();
+            for(int [] D : DIR){
+                int x = node[0] + D[0];
+                int y = node[1] + D[1];
+                if(x>=0 && x<row && y>=0 && y<col){
+                    if(matrix[x][y] > matrix[node[0]][node[1]]){
+                        in[x][y]--;
+                        if(in[x][y] == 0){
+                            q.offer(new int[]{x, y});
+                        } 
+                        }
+                    }  
+                }
+            }
+            len++;
+        }
+        return len;
+    }
+}
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+SAME PROBLEM BUT TOPSORT APPROACH.
+
+class Solution {
+    public int longestIncreasingPath(int[][] matrix) {
+        int m = matrix.length;
+        int n = matrix[0].length;
+        int[][] dp = new int[m][n];
+        int maxPath = 0;
+
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                int path = dfs(i, j, matrix, dp);
+                maxPath = Math.max(maxPath, path);
+            }
+        }
+
+        return maxPath;
+    }
+
+    public int dfs(int i, int j, int[][] matrix, int[][] dp) {
+        int[][] Dir = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
+
+        if (dp[i][j] != 0) {
+            return dp[i][j];
+        }
+
+        int len = 1;
+        for (int[] d : Dir) {
+            int x = i + d[0];
+            int y = j + d[1];
+            if (x >= 0 && x < matrix.length && y >= 0 && y < matrix[0].length && matrix[x][y] > matrix[i][j]) {
+                len = Math.max(len, 1 + dfs(x, y, matrix, dp));
+            }
+        }
+
+        dp[i][j] = len;
+        return len;
+    }
+}
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+2328. Number of Increasing Paths in a Grid
+
+class Solution {
+    public int countPaths(int[][] grid){
+        int mod = (int) 1e9 + 7;
+        int m= grid.length;
+        int n= grid[0].length;
+        int [][] in = new int [m][n];
+        int [] dp = new int[m*n];
+        int [][] dir = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
+        Arrays.fill(dp, 1);
+        Queue<Integer> q = new LinkedList<>();
+        for(int i=0; i<m; i++){
+            for(int j=0; j<n; j++){
+                for(int [] d: dir){
+                    int x = i + d[0];
+                    int y = j  + d[1];
+                    if(!isValid(x, y, m, n)) continue;
+                        if(grid[x][y] > grid[i][j])
+                            in[x][y]++;
+                    }
+            }
+        }
+        for(int i=0; i<m; i++){
+            for(int j=0; j<n; j++){
+                if(in[i][j] == 0){
+                    q.offer(i*n +j);
+                }
+            }
+        }
+        while(!q.isEmpty()){
+            int node = q.remove();
+            int r = node/n;
+            int c = node%n;
+            for(int []d : dir){
+                int x = r + d[0];
+                int y = c + d[1];
+                if(!isValid(x, y, m, n)) continue;
+                if(grid[x][y] > grid[r][c]){
+                    int cell = x*n+y;
+                    dp[cell] = (dp[cell]+dp[node]) % mod;
+                    in[x][y]--;
+                    if(in[x][y] == 0){
+                        q.offer(cell);
+                    }
+                }
+            }
+        }
+        int p=0;
+        for(int i : dp){
+            p = (p+i)%mod;
+        }
+        return p;
+    }
+    public boolean isValid(int r, int c, int m, int n) {
+        return r >= 0 && r < m && c >= 0 && c < n;
+    }
+}
+
+// cell = i * n + j
+// where i is the row index, j is the column index, and n is the number of columns in the grid.
+// To retrieve the original row and column indices from this single integer representation, we use:
+// Copy coderow = cell / n
+// col = cell % n
+// Integer division (/) gives us the row index because it represents how many complete rows are covered by the single integer representation.
+// Modulo operation (%) gives us the column index because it represents the remaining columns after dividing the single integer by the number of columns.
+// This technique allows us to efficiently store and retrieve cell positions using a single integer, which is useful when working with queues or 1D arrays to represent 2D grid positions.
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+802. Find Eventual Safe States
+
+class Solution {
+    public List<Integer> eventualSafeNodes(int[][] graph) {
+        int n = graph.length;
+        List<List<Integer>> adj = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            adj.add(new ArrayList<>());
+        }
+        int[] out = new int[n];
+        for (int i = 0; i < n; i++) {
+            for (int j : graph[i]) {
+                adj.get(j).add(i);
+                out[i]++;
+            }
+        }
+        Queue<Integer> q = new LinkedList<>();
+        for (int i = 0; i < n; i++) {
+            if (out[i] == 0) q.offer(i);
+        }
+        boolean [] safe = new boolean[n];
+        List<Integer> list = new ArrayList<>();
+        while (!q.isEmpty()) {
+            int node = q.remove();
+            safe[node] = true;
+            for (int newNode : adj.get(node)) {
+                out[newNode]--;
+                if (out[newNode] == 0) {
+                    q.add(newNode);
+                }
+            }
+        }
+        for(int i=0; i<n; i++){
+            if(safe[i])
+            list.add(i);
+        }
+        return list;
+    }
+}
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
