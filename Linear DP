@@ -1,0 +1,333 @@
+Climbing stairs
+class Solution {
+    public int climbStairs(int n) {
+        if(n == 1) return 1;
+        int [] dp = new int[n+1];
+        dp[1] = 1;
+        dp[2] = 2;
+        for(int i=3; i<=n; i++){
+            dp[i] = dp[i-1] + dp[i-2];
+        }
+        return dp[n];
+    }
+}
+
+House Robber - 1
+
+class Solution {
+    public int rob(int[] nums){
+        int n = nums.length;
+        //int [] dp = new int [nums.length];
+        // if( nums.length == 0){
+        //     return 0;
+        // }
+        // if(nums.length == 1){
+        //     return nums[0];
+        // }
+        // if(nums.length == 2){
+        //     return Math.max(nums[0], nums[1]);
+        // }
+        int prev = nums[0];
+        int prev2 = 0;
+       for(int i=1; i<n; i++){
+            int pick = nums[i];
+            if(i > 1){
+                pick = pick + prev2;
+            }
+            int not_pick = 0 + prev;
+            int curr = Math.max(pick, not_pick);
+            prev2=prev;
+            prev=curr;
+       }
+       return prev;
+    }
+}
+
+
+House robber - 2
+
+class Solution {
+    public int rob(int[] nums) {
+        if(nums.length == 1){
+            return nums[0];
+        }
+        int [] t = new int [nums.length];
+        int [] t2 = new int [nums.length];
+        for(int i=0; i<nums.length; i++){
+            if(i != 0){
+                t[i] = nums[i];
+            }
+            if(i != nums.length-1){
+                t2[i] = nums[i];
+            }
+            //System.out.println(t[i]);
+        }
+        int a1 = rob1(t);
+        System.out.print(a1);
+        int a2 = rob1(t2);
+        int ans = Math.max(a1, a2);
+        return ans;
+    }
+    public int rob1(int[] nums){
+        int n = nums.length;
+        //int [] dp = new int [nums.length];
+        if( nums.length == 0){
+            return 0;
+        }
+        if(nums.length == 1){
+            return nums[0];
+        }
+        if(nums.length == 2){
+            return Math.max(nums[0], nums[1]);
+        }
+        int prev = nums[0];
+        int prev2 = 0;
+       for(int i=1; i<n; i++){
+            int pick = nums[i];
+            if(i > 1){
+                pick = pick + prev2;
+            }
+            int not_pick = 0 + prev;
+            int curr = Math.max(pick, not_pick);
+            prev2=prev;
+            prev=curr;
+       }
+       return prev;
+    }
+}
+
+Best Time to Buy and Sell Stock
+
+class Solution {
+    public int maxProfit(int[] prices) {
+        int c = prices[0];
+        int ans = Integer.MIN_VALUE;
+        for(int i=0; i<prices.length; i++){
+            if(prices[i] < c){
+                c=prices[i];
+            }
+            ans=Math.max(ans, prices[i] - c);
+        }
+        return ans;
+    }
+}
+
+Best Time to Buy and Sell Stock II
+
+class Solution {
+    public int maxProfit(int[] prices){
+        int [][] dp = new int [prices.length][2];
+        for(int [] i : dp){
+            Arrays.fill(i, -1);
+        }
+        return solve(0, 1, prices, dp);
+    }
+    public int solve(int i, int buy, int [] prices, int [][] dp){
+        if(i == prices.length){
+            return 0;
+        }
+        if(dp[i][buy] != -1){
+            return dp[i][buy];
+        }
+        int ans=0;
+        if(buy == 1){
+            ans = Math.max(-prices[i] + solve(i+1, 0, prices, dp),
+                            0+ solve(i+1, 1, prices, dp));
+        }else{
+            ans = Math.max(prices[i] + solve(i+1, 1, prices, dp), 
+                            0+solve(i+1, 0, prices, dp));
+        }
+        return dp[i][buy]= ans;
+    }
+}
+
+Best Time to Buy and Sell Stock III
+
+class Solution {
+    public int maxProfit(int[] prices) {
+        int [][][] dp = new int [prices.length][2][3];
+        for(int [][] d : dp){
+            for(int [] i: d){
+                Arrays.fill(i, -1);
+            }
+        }
+        return solve(0, 1, prices, 2, dp);
+    }
+    public int solve(int i, int buy, int [] prices, int c, int [][][] dp){
+        if(i == prices.length || c==0){
+            return 0;
+        }
+        // if(c == 0){
+        //     return 0;
+        // }
+        if(dp[i][buy][c] != -1){
+            return dp[i][buy][c];
+        }
+        int ans = 0;
+        if(buy == 1){
+            ans = Math.max (-prices[i] + solve(i+1, 0, prices, c, dp), solve(i+1, 1, prices, c, dp));
+        }else{
+            ans = Math.max(prices[i] + solve(i+1, 1, prices, c-1, dp), solve(i+1, 0, prices, c, dp));
+        }
+        return dp[i][buy][c] = ans;
+    }
+}
+
+Coin Change
+
+class Solution {
+    public int coinChange(int[] coins, int amount) {
+        int [] dp = new int [amount + 1];
+        Arrays.fill(dp, -1);
+        int ans = solve(coins, amount, dp);
+        return (ans == Integer.MAX_VALUE) ? -1 : ans;
+    }
+    public int solve(int [] coins, int amount, int [] dp){
+
+        if(amount < 0){
+            return Integer.MAX_VALUE;
+        }
+
+        if(amount == 0){
+            return 0;
+        }
+
+        if(dp[amount] != -1){
+            return dp[amount];
+        }
+        
+        int min = Integer.MAX_VALUE;
+        for(int c : coins){
+            int ans = solve(coins, amount-c, dp);
+            if(ans != Integer.MAX_VALUE){
+                min = Math.min(min, 1+ans);
+            }
+        }
+        return dp[amount] = min;
+    }
+}
+
+Coin Change II
+
+class Solution {
+    public int change(int amount, int[] coins) {
+        int[][] memo = new int[coins.length][amount + 1];
+        for (int[] row : memo) {
+            Arrays.fill(row, -1);
+        }
+        return changeHelper(amount, coins, 0, memo);
+    }
+    private int changeHelper(int amount, int[] coins, int index, int[][] memo) {
+        if (amount == 0) {
+            return 1;
+        }
+        if (index == coins.length) {
+            return 0;
+        }
+        if (memo[index][amount] != -1) {
+            return memo[index][amount];
+        }
+        int combinations = 0;
+        combinations += changeHelper(amount, coins, index + 1, memo);
+        if (amount >= coins[index]) {
+            combinations += changeHelper(amount - coins[index], coins, index, memo);
+        }
+        memo[index][amount] = combinations;
+        return combinations;
+    }
+}
+Longest Palindromic Substring
+class Solution {
+    public String longestPalindrome(String s){
+        int n = s.length();
+        if(n == 0){
+            return "";
+        }
+
+        boolean [][] dp = new boolean [n][n];
+        for(int i=0; i<n; i++){
+            dp[i][i] = true;
+        }
+
+        int start = 0;
+        int max_length = 1;
+
+        for(int i=0; i<n-1; i++){
+            if(s.charAt(i) == s.charAt(i+1)){
+                dp[i][i+1] = true;
+                start=i;
+                max_length = 2;
+            }
+        }
+        for(int length = 3; length<=n; length++){
+            for(int i=0; i<n - length+1; i++){
+                int j = i + length-1;
+                if(s.charAt(i) == s.charAt(j) && dp[i+1][j-1] == true){
+                    dp[i][j] = true;
+                    start = i;
+                    max_length = length; 
+                }
+            }
+        }
+        return s.substring(start, max_length+start);
+    }
+}
+
+Longest Palindromic Subsequence
+
+class Solution {
+    public int longestPalindromeSubseq(String s){
+        int [][] dp = new int [s.length()][s.length()];
+        return solve(s, dp, 0, s.length()-1);
+    }
+    public int solve(String s, int [][] dp, int i, int j){
+        if(dp[i][j] != 0){
+            return dp[i][j];
+        }
+        if(i>j){
+            return 0;
+        }
+        if(i == j){
+            return 1;
+        }
+        if(s.charAt(i) == s.charAt(j)){
+            dp[i][j] = solve(s, dp, i+1, j-1)+2;
+        }else{
+            dp[i][j] = Math.max(solve(s, dp, i+1, j), solve(s, dp, i, j-1)); 
+        }
+        return dp[i][j];
+    }
+}
+
+Longest Common Subsequence
+class Solution {
+    public int longestCommonSubsequence(String t1, String t2) {
+        int m =  t1.length();
+        int n =  t2.length();
+        int [][] dp = new int [m+1][n+1];
+        for(int i=1; i<=m; i++){
+            for(int j=1; j<=n; j++){
+                if(t1.charAt(i-1) == t2.charAt(j-1)){
+                    dp[i][j] = 1+ dp[i-1][j-1]; 
+                }else{
+                    dp[i][j] = Math.max(dp[i][j-1], dp[i-1][j]);
+                }
+            }
+        }
+        String lcs = "";
+        int i=m, j=n;
+        while(i>0 && j>0){
+            if(t1.charAt(i-1) == t2.charAt(j-1)){
+                lcs = t1.charAt(i-1) + lcs;
+                i--;
+                j--;
+            }else if(dp[i-1][j] > dp[i][j-1]){
+                i--;
+            }else{
+                j--;
+            }
+        }
+        System.out.print(lcs);
+        return dp[m][n];
+    }
+}
