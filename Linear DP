@@ -466,3 +466,149 @@ class Solution {
         return dp[i] = ans;
     }
 }
+639. Decode Ways II
+
+class Solution {
+    private static final int MOD = 1000000007;
+    
+    public int numDecodings(String s) {
+        int n = s.length();
+        Long[] memo = new Long[n];
+        return (int) decodeHelper(s, 0, memo);
+    }
+    
+    private long decodeHelper(String s, int index, Long[] memo) {
+        // Base case: reached the end of the string, valid decoding
+        if (index == s.length()) {
+            return 1;
+        }
+        
+        // Invalid case: current character is '0', cannot be decoded
+        if (s.charAt(index) == '0') {
+            return 0;
+        }
+        
+        // If the result for the current index is already memoized, return it
+        if (memo[index] != null) {
+            return memo[index];
+        }
+        
+        long count = 0;
+        
+        if (s.charAt(index) == '*') {
+            // Current character is '*', it can represent any digit from '1' to '9'
+            // Recursively call decodeHelper for the next index and multiply the result by 9
+            count = (count + 9 * decodeHelper(s, index + 1, memo)) % MOD;
+            
+            if (index + 1 < s.length()) {
+                if (s.charAt(index + 1) == '*') {
+                    // Next character is also '*', we have 15 additional ways to decode (11-19, 21-26)
+                    count = (count + 15 * decodeHelper(s, index + 2, memo)) % MOD;
+                } else if (s.charAt(index + 1) >= '0' && s.charAt(index + 1) <= '6') {
+                    // Next character is between '0' and '6', we have 2 additional ways to decode (1x, 2x)
+                    count = (count + 2 * decodeHelper(s, index + 2, memo)) % MOD;
+                } else {
+                    // Next character is greater than '6', we have 1 additional way to decode (1x)
+                    count = (count + decodeHelper(s, index + 2, memo)) % MOD;
+                }
+            }
+        } else {
+            // Current character is a digit, recursively call decodeHelper for the next index
+            count = (count + decodeHelper(s, index + 1, memo)) % MOD;
+            
+            if (index + 1 < s.length()) {
+                if (s.charAt(index) == '1' && s.charAt(index + 1) == '*') {
+                    // Current character is '1' and next character is '*', we have 9 additional ways to decode (11-19)
+                    count = (count + 9 * decodeHelper(s, index + 2, memo)) % MOD;
+                } else if (s.charAt(index) == '2' && s.charAt(index + 1) == '*') {
+                    // Current character is '2' and next character is '*', we have 6 additional ways to decode (21-26)
+                    count = (count + 6 * decodeHelper(s, index + 2, memo)) % MOD;
+                } else if (s.charAt(index) == '1' || 
+                           (s.charAt(index) == '2' && s.charAt(index + 1) >= '0' && s.charAt(index + 1) <= '6')) {
+                    // Current character is '1' or (current character is '2' and next character is between '0' and '6'),
+                    // we have 1 additional way to decode (1x or 2x)
+                    count = (count + decodeHelper(s, index + 2, memo)) % MOD;
+                }
+            }
+        }
+        
+        // Memoize the result for the current index
+        memo[index] = count;
+        
+        return count;
+    }
+}
+
+1043. Partition Array for Maximum Sum
+class Solution {
+    public int maxSumAfterPartitioning(int[] arr, int k) {
+        int [] dp = new int [arr.length+1];
+        Arrays.fill(dp, -1);
+        return solve(arr, 0, k, dp);
+    }
+    public int solve(int  [] arr, int i, int k, int [] dp){
+        if(i == arr.length){
+            return 0;
+        }
+        if(dp[i] !=-1){
+            return dp[i];
+        }
+        int sum = 0;
+        int maxElement = Integer.MIN_VALUE;
+        int ans=0;
+        int len=0;
+        for(int j=i; j<Math.min(arr.length, i+k); j++){
+            len++;
+            maxElement = Math.max(maxElement, arr[j]);
+            sum = (len*maxElement) + solve(arr, j+1, k, dp);
+            ans=Math.max(ans, sum);
+        }
+        return dp[i] = ans;
+    }
+}
+
+1235. Maximum Profit in Job Scheduling
+class Solution {
+    public int jobScheduling(int[] startTime, int[] endTime, int[] profit) {
+        int n = startTime.length;
+        int [][] jobs = new int [n][3];
+        for(int i=0; i<n; i++){
+            jobs[i] = new int []{startTime[i], endTime[i], profit[i]};
+        }
+        Arrays.sort(jobs, (a, b) -> a[0]-b[0]);
+        int [] dp = new int [n+1];
+        Arrays.fill(dp, -1);
+        return solve( jobs, 0, dp);
+    }
+    public int solve(int [][] jobs, int i, int [] dp){
+        if(i >= jobs.length){
+            return 0;
+        }
+        if(dp[i]!=-1){
+            return dp[i];
+        }
+        int pick = jobs[i][2];
+        int next_available_time = getTime(jobs, jobs[i], i);
+        if(next_available_time != -1){
+            pick +=   solve(jobs, next_available_time, dp);
+        }
+        int not_pick = solve(jobs, i+1, dp);
+        return dp[i] = Math.max(pick, not_pick);
+    }
+    public int getTime(int[][] jobs, int [] job, int i){
+        int left=i, right=jobs.length-1;
+        int pos = -1;
+        while(left <= right){
+            int mid = left+(right-left) / 2;
+            int start = jobs[mid][0];
+            int end = job[1];
+            if(start>=end){
+                pos = mid;
+                right = mid-1;
+            }else{
+                left=mid+1;
+            }
+        }
+        return pos;
+    }
+}
